@@ -40,9 +40,9 @@ export default function App() {
 
   useEffect(() => {
 
-    /* connect itunes Store */
     (async function initialize() {
-
+      
+      /* connect itunes Store */
       try {
         const result = await RNIap.initConnection()
         console.log('connection is => ', result)
@@ -70,7 +70,9 @@ export default function App() {
             }
           }
           purchaseConfirmed()
-          // this.setState({ receipt: purchase.transactionReceipt })
+  
+          setReceipt(purchase.transactionReceipt)
+          console.log(purchase.transactionReceipt)
           purchaseErrorSubscription = purchaseErrorListener(
             (error) => {
               console.log('purchaseErrorListener', error)
@@ -114,7 +116,7 @@ export default function App() {
 
       setProductList(products)
 
-      // this.requestPurchase(itemSkus[0])
+      // requestPurchase(itemSkus[0])
     } catch (err) {
 
       console.log('getItems || purchase error => ', err)
