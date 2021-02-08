@@ -3,10 +3,14 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  View,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
   Alert,
 } from 'react-native'
+
+import { version } from './package.json'
 
 import RNIap, {
   Product,
@@ -22,7 +26,7 @@ const itemSkus = Platform.select({
   android: ['com.example.productId'],
 })
 
-const itemSubs = Platform.select({ ios: ['passvipnew'], android: ['test.sub'] })
+const itemSubs = Platform.select({ ios: ['passvip'], android: ['test.sub'] })
 let purchaseUpdateSubscription, purchaseErrorSubscription
 
 export default function App() {
@@ -30,6 +34,8 @@ export default function App() {
   const [productList, setProductList] = useState([])
   const [receipt, setReceipt] = useState([])
   const [availableItemsMessage, setAvailableItemsMessage] = useState([])
+  const [loader, setLoader] = useState(false)
+  const [loaderPay, setLoaderPay] = useState(false)
 
 
   useEffect(() => {
@@ -90,16 +96,19 @@ export default function App() {
 
   }, [])
 
-  const getItems = async () => {
+  const getItems = async (show) => {
 
-    
+    setLoader(true)
+
     try {
 
       console.log('itemSkus[0]', itemSkus[0])
 
       const products = await RNIap.getProducts(itemSkus)
 
-      alert(JSON.stringify(products))
+      if (show) {
+        alert(JSON.stringify(products))
+      }
 
       console.log('getItems => Products', products)
 
@@ -110,9 +119,13 @@ export default function App() {
 
       console.log('getItems || purchase error => ', err)
     }
+
+    setLoader(false)
   }
 
-  const getSubscriptions = async () => {
+  const getSubscriptions = async (show) => {
+
+    setLoader(true)
 
     try {
 
@@ -120,54 +133,73 @@ export default function App() {
 
       console.log('Products => ', products)
 
-      alert(JSON.stringify(products[0]))
+      if (show) {
+
+        alert(JSON.stringify(products[0]))
+
+      }
 
       setProductList(products)
 
     } catch (err) {
       console.log('getSubscriptions error => ', err)
     }
+    setLoader(false)
   }
 
   const getAvailablePurchases = async () => {
+
+    setLoader(true)
 
     try {
 
       const purchases = await RNIap.getAvailablePurchases()
       console.info('Available purchases => ', purchases)
-      
+
       alert(purchases)
 
       if (purchases && purchases.length > 0) {
         setAvailableItemsMessage(`Got ${purchases.length} items.`)
         setReceipt(purchases[0].transactionReceipt)
-       
+
       }
 
     } catch (err) {
       console.warn(err.code, err.message)
       console.log('getAvailablePurchases error => ', err)
     }
+    setLoader(false)
+
   }
 
   const requestPurchase = async (sku) => {
 
-    try {
+    setLoader(true)
 
-      RNIap.requestPurchase(sku)
+    try {
+      await getItems(false)
+      await RNIap.requestPurchase(sku)
 
     } catch (err) {
       console.log('requestPurchase error => ', err)
     }
 
+    setLoader(false)
+
   }
   const requestSubscription = async (sku) => {
+
+    setLoaderPay(true)
+
     try {
-      // await getSubscriptions()
+      await getSubscriptions(false)
       await RNIap.requestSubscription(sku)
     } catch (err) {
       alert(err.toLocaleString())
     }
+
+    setLoaderPay(false)
+
   }
 
   const purchaseConfirmed = () => {
@@ -181,24 +213,24 @@ export default function App() {
   return (
     <SafeAreaView style={styles.rootContainer}>
 
-      <Text style={{ marginTop: 30, fontSize: 30 }}>RNApplePay</Text>
+      <Text style={{ marginTop: 30, fontSize: 20 }}>RNApplePay v-{version}</Text>
 
       <TouchableOpacity
-        onPress={() => getItems() }
+        onPress={() => getItems(true)}
         style={styles.buttonStyle}>
         <Text style={styles.buttonText}>Listar Produtos</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => getSubscriptions()}
+        onPress={() => getSubscriptions(true)}
         style={styles.buttonStyle}>
-        <Text style={styles.buttonText}>Listar Incrições</Text>
+        <Text style={styles.buttonText}>Listar Inscrições</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => getAvailablePurchases()}
         style={styles.buttonStyle}>
-        <Text style={styles.buttonText}>Compras disponíveis</Text>
+        <Text style={styles.buttonText}>Produtos disponíveis</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -206,14 +238,22 @@ export default function App() {
         style={styles.buttonStyle}>
         <Text style={styles.buttonText}>Comprar Produto</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity
         onPress={() => requestSubscription(itemSubs[0])}
         style={styles.buttonStyle}>
-        <Text style={styles.buttonText}>Comprar Incrições</Text>
+        <Text style={styles.buttonText}>Comprar Inscrição</Text>
       </TouchableOpacity>
 
       <Text style={{ marginTop: 30 }}>By Rosival de Souza</Text>
+      {
+        loader || loaderPay ?
+          <View style={{ position: 'absolute', top: "50%", right: 0, left: 0 }}>
+            <ActivityIndicator size="large" color="white" />
+          </View>
+          :
+          <></>
+      }
     </SafeAreaView>
   )
 }
