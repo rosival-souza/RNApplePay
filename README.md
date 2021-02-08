@@ -1,3 +1,5 @@
 # RNApplePay
 
-![Simulator Screen Shot - iPhone 11 - 2021-02-07 at 22 45 27](https://user-images.githubusercontent.com/25927724/107167050-958d2c00-6996-11eb-87ca-11274ab3b29f.png)
+![IMG_8162_iphonexrsilver_portrait](https://user-images.githubusercontent.com/25927724/107169370-72657b00-699c-11eb-9a0b-49189a464918.png)
+
+![IMG_8163_iphonexrsilver_portrait](https://user-images.githubusercontent.com/25927724/107169420-8c06c280-699c-11eb-8852-0b893961313c.png)
