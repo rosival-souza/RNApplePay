@@ -1,7 +1,7 @@
 # RNApplePay
 
-1 . Create account in Apple Developer
-2 . Create App In-App Purchases in appstoreconnect.apple.com
+* 1 . Create account in Apple Developer
+* 2 . Create App In-App Purchases in appstoreconnect.apple.com
 3 . In Manage create Non-Consumable or Consumable and link you productID
 4 . In Users and Access enable Sandbox for test
 
